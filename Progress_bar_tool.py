@@ -114,13 +114,13 @@ class Progress_bar:
         if self.current == self.max_step:
             total_run_time_str = self.__formatted_time(round(time.time() - self.initial_start_time, 3))
             if len(total_run_time_str) > 0:
-                return " - Total run time: " + total_run_time_str
+                return " - \033[1mTotal run time: \033[0m" + total_run_time_str
             else:
                 return ""
         else:
             run_time_str = self.__formatted_time(self.run_time)
             if len(run_time_str) > 0:
-                return " - Run time: " + run_time_str
+                return " - \033[1mRun time: \033[0m" + run_time_str
             else:
                 return ""
 
@@ -129,14 +129,14 @@ class Progress_bar:
         eta_str = self.__formatted_time(sum(self.run_time_lst)/len(self.run_time_lst) * (self.max_step-self.current))
 
         if len(eta_str) > 0:
-            return " - ETA: " + eta_str
+            return " - \033[1mETA: \033[0m" + eta_str
         else:
             return ""
 
     @property
     def __process_completed_msg(self):
         if self.current == self.max_step:
-            return " - Process Completed"
+            return " - \033[3;4;32mProcess Completed\033[0m"
         else:
             return ""
 
@@ -149,7 +149,7 @@ class Progress_bar:
             self.current_circle_pos += 1
             if self.current_circle_pos > len(self.circle_pos_lst)-1:
                 self.current_circle_pos = 0
-            return "[" + self.circle_pos_lst[self.current_circle_pos] + "] "
+            return "[\033[36m" + self.circle_pos_lst[self.current_circle_pos] + "\033[0m] "
         else:
             return ""
 
@@ -242,10 +242,10 @@ class Progress_bar:
 
 if __name__ == "__main__":
     maxi_step = 100
-    bar = Progress_bar(maxi_step, label="Demo bar", process_count=True, progress_percent=True, run_time=False, eta=True, overwrite_setting=True)
+    bar = Progress_bar(maxi_step, label="Demo bar", process_count=True, progress_percent=True, run_time=True, eta=True, overwrite_setting=True)
 
     for i in range(maxi_step):
-        for j in range(1):
+        for j in range(4):
             bar.update_activity_indicator()
             time.sleep(0.01)
         bar.update_progress_bar()
