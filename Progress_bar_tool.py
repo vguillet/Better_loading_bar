@@ -3,37 +3,40 @@ from math import modf
 
 
 class Progress_bar:
-    def __init__(self, max_step, bar_size=30, label=None, overwrite_setting=True):
+    def __init__(self, max_step, bar_size=30, label=None,
+                 process_count=True,
+                 progress_percent=True,
+                 run_time=True,
+                 eta=True,
+                 overwrite_setting=True):
 
         # --> Initiate Progress bar
         self.overwrite_setting = overwrite_setting
-
-        self.bar_size = bar_size
         self.max_step = max_step
+        self.bar_size = bar_size
+
+        self.print_process_count = process_count
+        self.print_progress_percent = progress_percent
+        self.print_run_time = run_time
+        self.print_eta = eta
+
+        # --> Determine bar properties based on input
         self.step = max_step/self.bar_size
         self.current = 0
-
-        # --> Add label if provided
-        if label is not None:
-            extra_str = 6 - len(label)
-            self.label = label + " "*extra_str + " | "
-        else:
-            self.label = ""
-
-        # --> Initiated loading circle if overwrite setting is true and select style
-        if overwrite_setting is True:
-            self.circle_pos_lst = ["-", "\\", "|", "/"]
-            # self.circle_pos_lst = ["   ", ".  ", ".. ", "..."]
-
-            self.current_circle_pos = 0
+        self.label = label
+        self.current_circle_pos = 0
 
         # --> Initiate time tracker
         self.initial_start_time = time.time()
         self.start_time = self.initial_start_time
         self.run_time_lst = []
 
-    def update_progress_bar(self, current):
-        self.current = current+1
+    def update_progress_bar(self, current=None):
+        if current is not None:
+            self.current = current+1
+        else:
+            self.current += 1
+
         self.run_time = round(time.time() - self.start_time, 3)
         self.run_time_lst.append(self.run_time)
 
@@ -61,23 +64,30 @@ class Progress_bar:
     # ===============================================================================
     @property
     def __progress_bar(self):
-        return self.__loading_circle \
-               + self.label \
-               + self.__process_count \
-               + self.__bar \
-               + self.__progress_percent \
-               + "  " \
-               + self.__run_time \
-               + self.__eta \
+        return self.__loading_circle                                  \
+               + self.__label                                         \
+               + self.__process_count*self.print_process_count        \
+               + self.__bar                                           \
+               + self.__progress_percent*self.print_progress_percent  \
+               + "  "*(self.print_run_time or self.print_eta)         \
+               + self.__run_time*self.print_run_time                  \
+               + self.__eta*self.print_eta                            \
                + self.__process_completed_msg
 
     @property
     def __activity_bar(self):
-        return self.__loading_circle \
-               + self.label \
-               + self.__process_count \
-               + self.__bar \
+        return self.__loading_circle                                  \
+               + self.__label                                           \
+               + self.__process_count*self.print_process_count        \
+               + self.__bar                                           \
                + self.__progress_percent
+
+    @property
+    def __label(self):
+        if self.label is not None:
+            return self.label + " "*(6 - len(self.label)) + " | "
+        else:
+            return ""
 
     @property
     def __progress_percent(self):
@@ -132,6 +142,9 @@ class Progress_bar:
 
     @property
     def __loading_circle(self):
+        self.circle_pos_lst = ["-", "\\", "|", "/"]
+        # self.circle_pos_lst = ["   ", ".  ", ".. ", "..."]
+
         if self.overwrite_setting is True and self.current != self.max_step:
             self.current_circle_pos += 1
             if self.current_circle_pos > len(self.circle_pos_lst)-1:
@@ -143,6 +156,10 @@ class Progress_bar:
     # ===============================================================================
     # ----------------------- String formatting functions ---------------------------
     # ===============================================================================
+    @staticmethod
+    def monkey_patch_pass(*args, **kwargs):
+        return
+
     def __formatted_time(self, formatted_time):
 
         formatted_time = [0, formatted_time]
@@ -224,12 +241,12 @@ class Progress_bar:
 
 
 if __name__ == "__main__":
-    maxi_step = 37400000
-    bar = Progress_bar(maxi_step, label="Demo bar", overwrite_setting=True)
+    maxi_step = 100
+    bar = Progress_bar(maxi_step, label="Demo bar", process_count=True, progress_percent=True, run_time=False, eta=True, overwrite_setting=True)
 
     for i in range(maxi_step):
-        for j in range(200):
+        for j in range(1):
             bar.update_activity_indicator()
             time.sleep(0.01)
-        bar.update_progress_bar(i)
+        bar.update_progress_bar()
 
