@@ -8,7 +8,8 @@ class Progress_bar:
                  progress_percent=True,
                  run_time=True,
                  eta=True,
-                 overwrite_setting=True):
+                 overwrite_setting=True,
+                 rainbow_bar=False):
 
         # --> Initiate Progress bar
         self.overwrite_setting = overwrite_setting
@@ -30,6 +31,19 @@ class Progress_bar:
         self.initial_start_time = time.time()
         self.start_time = self.initial_start_time
         self.run_time_lst = []
+
+        # --> Colours and Formatting
+        self.rainbow_bar = rainbow_bar
+        self.colours = {"reset": "\033[0m",
+                        "bold": "\033[1m",
+                        "green": "\033[3;32;1m",
+                        "red": "\033[31;1m",
+                        "magenta": "\033[35;1m",
+                        "yellow": "\033[33;1m",
+                        "cyan": "\033[36;1m",
+                        "blue": "\033[34;1m"}
+        self.rainbow = [self.colours["red"], self.colours["yellow"], self.colours["green"],
+                        self.colours["cyan"], self.colours["blue"], self.colours["magenta"]]
 
     def update_progress_bar(self, current=None):
         if current is not None:
@@ -91,6 +105,10 @@ class Progress_bar:
 
     @property
     def __progress_percent(self):
+        if round((self.current/self.max_step)*100) == 100:
+            return " - " + self.colours["green"] + \
+                   self.__aligned_number(round((self.current / self.max_step) * 100), 2) + "%" + \
+                   self.colours["reset"]
         return " - " + self.__aligned_number(round((self.current/self.max_step)*100), 2) + "%"
 
     @property
@@ -99,14 +117,31 @@ class Progress_bar:
 
     @property
     def __bar(self):
-        bar = " - ["
-        nb_of_steps = int(self.current / self.step)
-        for _ in range(nb_of_steps):
-            bar = bar + "="
-        bar = bar + ">"
-        for _ in range(self.bar_size-nb_of_steps):
-            bar = bar + " "
-        bar = bar + "]"
+        if self.rainbow_bar is False:
+            bar = " - ["
+            nb_of_steps = int(self.current / self.step)
+            for _ in range(nb_of_steps):
+                bar = bar + "="
+            bar = bar + ">"
+            for _ in range(self.bar_size-nb_of_steps):
+                bar = bar + " "
+            bar = bar + "]"
+
+        else:
+            bar = self.colours["reset"] + "]"
+            rainbow = -1
+            nb_of_steps = int(self.current / self.step)
+            for _ in range(self.bar_size - nb_of_steps):
+                bar = " " + bar
+
+            bar = self.colours["reset"] + ">" + bar
+
+            for _ in range(nb_of_steps):
+                bar = self.rainbow[rainbow] + "=" + bar
+                rainbow -= 1
+                if rainbow < -1 * len(self.rainbow):
+                    rainbow = -1
+            bar = " - [" + bar
         return bar
 
     @property
@@ -114,13 +149,13 @@ class Progress_bar:
         if self.current == self.max_step:
             total_run_time_str = self.__formatted_time(round(time.time() - self.initial_start_time, 3))
             if len(total_run_time_str) > 0:
-                return " - \033[1mTotal run time: \033[0m" + total_run_time_str
+                return " - " + self.colours["bold"] + "Total run time: " + self.colours["reset"] + total_run_time_str
             else:
                 return ""
         else:
             run_time_str = self.__formatted_time(self.run_time)
             if len(run_time_str) > 0:
-                return " - \033[1mRun time: \033[0m" + run_time_str
+                return " - " + self.colours["bold"] + "Run time: " + self.colours["reset"] + run_time_str
             else:
                 return ""
 
@@ -129,14 +164,14 @@ class Progress_bar:
         eta_str = self.__formatted_time(sum(self.run_time_lst)/len(self.run_time_lst) * (self.max_step-self.current))
 
         if len(eta_str) > 0:
-            return " - \033[1mETA: \033[0m" + eta_str
+            return " - " + self.colours["bold"] + "ETA: " + self.colours["reset"] + eta_str
         else:
             return ""
 
     @property
     def __process_completed_msg(self):
         if self.current == self.max_step:
-            return " - \033[3;4;32mProcess Completed\033[0m"
+            return " - " + self.colours["green"] + "Process Completed" + self.colours["reset"]
         else:
             return ""
 
@@ -149,7 +184,7 @@ class Progress_bar:
             self.current_circle_pos += 1
             if self.current_circle_pos > len(self.circle_pos_lst)-1:
                 self.current_circle_pos = 0
-            return "[\033[36m" + self.circle_pos_lst[self.current_circle_pos] + "\033[0m] "
+            return "[" + self.colours["cyan"] + self.circle_pos_lst[self.current_circle_pos] + self.colours["reset"] + "] "
         else:
             return ""
 
@@ -242,7 +277,7 @@ class Progress_bar:
 
 if __name__ == "__main__":
     maxi_step = 100
-    bar = Progress_bar(maxi_step, label="Demo bar", process_count=True, progress_percent=True, run_time=True, eta=True, overwrite_setting=True)
+    bar = Progress_bar(maxi_step, label="Demo bar", process_count=True, progress_percent=True, run_time=True, eta=True, overwrite_setting=True, rainbow_bar=True)
 
     for i in range(maxi_step):
         for j in range(4):
