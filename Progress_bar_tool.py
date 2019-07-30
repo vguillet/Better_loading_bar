@@ -26,6 +26,7 @@ class Progress_bar:
         self.current = 0
         self.label = label
         self.current_circle_pos = 0
+        self.colored_bar_lock = 0
 
         # --> Initiate time tracker
         self.initial_start_time = time.time()
@@ -42,8 +43,6 @@ class Progress_bar:
                         "yellow": "\033[33;1m",
                         "cyan": "\033[36;1m",
                         "blue": "\033[34;1m"}
-        self.rainbow = [self.colours["red"], self.colours["yellow"], self.colours["green"],
-                        self.colours["cyan"], self.colours["blue"], self.colours["magenta"]]
 
     def update_progress_bar(self, current=None):
         if current is not None:
@@ -120,14 +119,26 @@ class Progress_bar:
         if self.rainbow_bar is False:
             bar = " - ["
             nb_of_steps = int(self.current / self.step)
-            for _ in range(nb_of_steps):
-                bar = bar + "="
+
+            # --> Defined location of colored section
+            self.colored_bar_lock += 1
+            if self.colored_bar_lock > nb_of_steps:
+                self.colored_bar_lock = 0
+
+            for i in range(nb_of_steps):
+                if i == self.colored_bar_lock:
+                    bar = bar + self.colours["cyan"] + "=" + self.colours["reset"]
+                else:
+                    bar = bar + "="
+                    
             bar = bar + ">"
             for _ in range(self.bar_size-nb_of_steps):
                 bar = bar + " "
             bar = bar + "]"
 
         else:
+            rainbow_lst = [self.colours["red"], self.colours["yellow"], self.colours["green"],
+                           self.colours["cyan"], self.colours["blue"], self.colours["magenta"]]
             bar = self.colours["reset"] + "]"
             rainbow = -1
             nb_of_steps = int(self.current / self.step)
@@ -137,9 +148,9 @@ class Progress_bar:
             bar = self.colours["reset"] + ">" + bar
 
             for _ in range(nb_of_steps):
-                bar = self.rainbow[rainbow] + "=" + bar
+                bar = rainbow_lst[rainbow] + "=" + bar
                 rainbow -= 1
-                if rainbow < -1 * len(self.rainbow):
+                if rainbow < -1 * len(rainbow_lst):
                     rainbow = -1
             bar = " - [" + bar
         return bar
