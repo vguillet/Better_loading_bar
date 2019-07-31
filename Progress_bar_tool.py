@@ -169,6 +169,8 @@ class Progress_bar:
                            self.colours["cyan"], self.colours["blue"], self.colours["magenta"]]
             bar = self.colours["reset"] + "]"
             rainbow = -1 + self.colored_bar_lock
+            if rainbow >= len(rainbow_lst):
+                rainbow = -1
 
             # --> Create empty portion of bar
             for _ in range(self.bar_size - nb_of_steps):
@@ -326,12 +328,12 @@ if __name__ == "__main__":
                        eta=True,
                        overwrite_setting=True,
                        bar_type="Equal",
-                       activity_indicator_type="Bar spinner",
-                       rainbow_bar=False)
+                       activity_indicator_type="Moon spinner",
+                       rainbow_bar=True)
 
     for i in range(maxi_step):
         for j in range(4):
             bar.update_activity()
-            time.sleep(0.2)
+            time.sleep(0.1)
         bar.update_progress()
 
