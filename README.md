@@ -24,7 +24,7 @@ Progress bars are used to keep track of pre-defined length processes. To create 
 bar =  Progress_bar(max_step=30)
 ```
 
-Run` .update_progress` to update progress (for loops) or `.update_activity` to keep the activity animations going between main progress updates (when minor progress is made).
+Run `.update_progress` to update progress (for loops) or `.update_activity` to keep the activity animations going between main progress updates (when minor progress is made).
 
 ### Activity bar
 
@@ -36,5 +36,3 @@ bar =  Progress_bar(max_step=None)
 ```
 
 Run `.update_activity` at the end of every iteration to update activity.
-
-***NEW FEATURES:*** Added coloured and ***rainbow bar***
