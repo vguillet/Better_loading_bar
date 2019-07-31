@@ -55,9 +55,10 @@ class Progress_bar:
 
         self.indicator_dict = {"Bar spinner": ["-", "\\", "|", "/"],
                                "Dots": ["   ", ".  ", ".. ", "..."],
-                               "Column": ['⡀', '⡄', '⡆', '⡇', '⣇', '⣧', '⣷', '⣿'],
+                               "Dot Column": ['⡀', '⡄', '⡆', '⡇', '⣇', '⣧', '⣷', '⣿'],
                                "Pie spinner": ['◷', '◶', '◵', '◴'],
-                               "Moon spinner": ['◑', '◒', '◐', '◓']}
+                               "Moon spinner": ['◑', '◒', '◐', '◓'],
+                               "Stack": [' ', '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█']}
 
         self.colours = {"reset": "\033[0m",
                         "bold": "\033[1m",
@@ -101,7 +102,7 @@ class Progress_bar:
     # ===============================================================================
     @property
     def __progress_bar(self):
-        return self.__activity_indicator                                  \
+        return self.__activity_indicator                              \
                + self.__label                                         \
                + self.__process_count*self.print_process_count        \
                + self.__bar                                           \
@@ -113,8 +114,8 @@ class Progress_bar:
 
     @property
     def __activity_bar(self):
-        return self.__activity_indicator                                  \
-               + self.__label                                           \
+        return self.__activity_indicator                              \
+               + self.__label                                         \
                + self.__process_count*self.print_process_count        \
                + self.__bar                                           \
                + self.__progress_percent*self.print_progress_percent
@@ -141,50 +142,48 @@ class Progress_bar:
     @property
     def __bar(self):
         nb_of_steps = int(self.current / self.step)
-
-        # --> Define location of colored section
         self.colored_bar_lock += 1
-        if self.colored_bar_lock > nb_of_steps:
-            self.colored_bar_lock = 0
 
+        # --> Prefix of bar
+        bar = " - ["
+        
+        # ---- Create filled portion of bar
         if not self.rainbow_bar:
-            bar = " - ["
+            # --> Define location of colored section
+            if self.colored_bar_lock > nb_of_steps:
+                self.colored_bar_lock = 0
 
-            # --> Create filled portion of bar
-            for i in range(nb_of_steps):
-                if i == self.colored_bar_lock:
+            for step in range(nb_of_steps):
+                if step == self.colored_bar_lock:
                     bar = bar + self.colours["cyan"] + self.bar_dict[self.bar_type]["Full"] + self.colours["reset"]
                 else:
                     bar = bar + self.bar_dict[self.bar_type]["Full"]
 
-            bar = bar + ">"
-
-            # --> Create empty portion of bar
-            for _ in range(self.bar_size-nb_of_steps):
-                bar = bar + self.bar_dict[self.bar_type]["Empty"]
-            bar = bar + "]"
-
         else:
             rainbow_lst = [self.colours["red"], self.colours["yellow"], self.colours["green"],
                            self.colours["cyan"], self.colours["blue"], self.colours["magenta"]]
-            bar = self.colours["reset"] + "]"
-            rainbow = -1 + self.colored_bar_lock
-            if rainbow >= len(rainbow_lst):
-                rainbow = -1
 
-            # --> Create empty portion of bar
-            for _ in range(self.bar_size - nb_of_steps):
-                bar = self.bar_dict[self.bar_type]["Empty"] + bar
+            if self.colored_bar_lock > len(rainbow_lst):
+                self.colored_bar_lock = 0
 
-            bar = self.colours["reset"] + ">" + bar
+            rainbow = self.colored_bar_lock
 
             # --> Create filled portion of bar
             for _ in range(nb_of_steps):
-                bar = rainbow_lst[rainbow] + self.bar_dict[self.bar_type]["Full"] + bar
-                rainbow -= 1
-                if rainbow < -1 * len(rainbow_lst):
-                    rainbow = -1
-            bar = " - [" + bar
+                bar = bar + rainbow_lst[rainbow] + self.bar_dict[self.bar_type]["Full"] + bar
+                rainbow += 1
+                if rainbow > len(rainbow_lst):
+                    rainbow = 0
+
+        bar = ">" + bar
+
+        # --> Create empty portion of bar
+        for _ in range(self.bar_size - nb_of_steps):
+            bar = bar + self.bar_dict[self.bar_type]["Empty"]
+
+        # --> Suffix of bar
+        bar = bar + "]"
+
         return bar
 
     @property

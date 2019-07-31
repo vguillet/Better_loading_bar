@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="680e9b83-ff96-4eb0-8bac-483d8fb60e6c" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Progress_bar_tool.py" beforeDir="false" afterPath="$PROJECT_DIR$/Progress_bar_tool.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -15,8 +16,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Progress_bar_tool.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="217">
-              <caret line="297" column="22" lean-forward="true" selection-start-line="297" selection-start-column="22" selection-end-line="297" selection-end-column="22" />
+            <state relative-caret-position="379">
+              <caret line="172" lean-forward="true" selection-start-line="172" selection-end-line="172" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
               </folding>
@@ -29,9 +30,13 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>self.rainbow</find>
+      <find>__loading_circle</find>
+      <find>circle</find>
     </findStrings>
     <replaceStrings>
       <replace>rainbow_lst</replace>
+      <replace>__activity_indicator</replace>
+      <replace>indicator</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -79,6 +84,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
@@ -137,18 +143,18 @@
       <option name="presentableId" value="Default" />
       <updated>1564510573419</updated>
       <workItem from="1564510579901" duration="2522000" />
-      <workItem from="1564567010936" duration="637000" />
+      <workItem from="1564567010936" duration="3396000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3159000" />
+    <option name="totallyTimeSpent" value="5918000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.07377599" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.07377599" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -176,13 +182,13 @@
     <option name="version" value="1" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Better_loading_bar$Progress_bar_tool.coverage" NAME="Progress_bar_tool Coverage Results" MODIFIED="1564567555299" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Better_loading_bar$Progress_bar_tool.coverage" NAME="Progress_bar_tool Coverage Results" MODIFIED="1564569612446" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/Progress_bar_tool.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="217">
-          <caret line="297" column="22" lean-forward="true" selection-start-line="297" selection-start-column="22" selection-end-line="297" selection-end-column="22" />
+        <state relative-caret-position="379">
+          <caret line="172" lean-forward="true" selection-start-line="172" selection-end-line="172" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
           </folding>
