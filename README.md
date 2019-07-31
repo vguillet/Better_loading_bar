@@ -1,6 +1,6 @@
 Better_loading_bar
 
-Better_loading_bar is a single script, multi-function and multi-option class meant to allow for easy setting up and tracking of task progress. ANSI colors are used to enhance readability, but require compatible install to be visible (progress bar will work regardless).
+Better_loading_bar is a single script, multi-function and multi-option class meant to allow for easy setting up and tracking of task progress. ANSI colours are used to enhance readability, but require compatible install to be visible (progress bar will work regardless).
 
 Integration is kept as simple as possible, while giving the user full access to a significant number of usefull information such as ETA, run time, completion, etc...
 
