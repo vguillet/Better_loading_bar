@@ -14,6 +14,13 @@ class Progress_bar:
                  activity_indicator_type="Dots",
                  rainbow_bar=False):
 
+        # --> Error-proofing input:
+        if type(max_step) is not int and max_step is not None:
+            raise ValueError("Input for 'max_step' must be an integer or None")
+
+        if type(bar_size) is not int or bar_size <= 0:
+            raise ValueError("Input for 'bar_size' must be an integer bigger than 0")
+
         # --> Initiate Progress bar
         self.overwrite_setting = overwrite_setting
         self.bar_size = bar_size
@@ -81,7 +88,18 @@ class Progress_bar:
                         "cyan": "\033[36;1m",
                         "blue": "\033[34;1m"}
 
+        if bar_type not in self.bar_dict.keys():
+            raise ValueError("Selected bar type doesn't exist,"
+                             "Bar type options: \nEqual  ( = ), \nSolid  ( █ ), \nCircle ( ◉ ), \nSquare ( ▣ )")
+
+        if activity_indicator_type not in self.indicator_dict:
+            raise ValueError("Selected activity indicator type doesn't exist,"
+                             "Activity indicator type options: Bar spinner, Dots, Column, Pie spinner, Moon spinner, Stack, Pie stack")
+
     def update_progress(self, current=None):
+        if not self.progress:
+            raise ValueError("'max_step' needs to be specified to compute progress")
+
         # --> Calc and record run time
         self.run_time = round(time.time() - self.start_time, 3)
 
@@ -353,7 +371,7 @@ if __name__ == "__main__":
     "Bar type options: Equal, Solid, Circle, Square"
     "Activity indicator type options: Bar spinner, Dots, Column, Pie spinner, Moon spinner, Stack, Pie stack"
 
-    bar = Progress_bar(max_step=None,
+    bar = Progress_bar(max_step=maxi_step,
                        label="Demo bar",
                        process_count=True,
                        progress_percent=True,
@@ -368,4 +386,4 @@ if __name__ == "__main__":
         for j in range(4):
             bar.update_activity()
             time.sleep(0.01)
-        # bar.update_progress()
+        bar.update_progress()
