@@ -9,6 +9,7 @@ class Progress_bar:
                  run_time=True,
                  eta=True,
                  overwrite_setting=True,
+                 bar_type="Solid",
                  rainbow_bar=False):
 
         # --> Initiate Progress bar
@@ -33,8 +34,21 @@ class Progress_bar:
         self.start_time = self.initial_start_time
         self.run_time_lst = []
 
-        # --> Colours and Formatting
+        # ---- Colours and Formatting
+        # --> Setting up bar formating
         self.rainbow_bar = rainbow_bar
+        self.type = bar_type
+
+        # --> Setting up format library
+        self.bar_type = {"Equal": {"Full": "=",
+                                   "Empty": " "},
+                         "Solid": {"Full": "█",
+                                   "Empty": " "},
+                         "Circle": {"Full": "◯",
+                                    "Empty": "◉"},
+                         "Square": {"Full": "▢",
+                                    "Empty": "▣"}}
+
         self.colours = {"reset": "\033[0m",
                         "bold": "\033[1m",
                         "green": "\033[3;32;1m",
@@ -116,24 +130,25 @@ class Progress_bar:
 
     @property
     def __bar(self):
-        if self.rainbow_bar is False:
+        if not self.rainbow_bar:
             bar = " - ["
             nb_of_steps = int(self.current / self.step)
 
-            # --> Defined location of colored section
+            # --> Define location of colored section
             self.colored_bar_lock += 1
             if self.colored_bar_lock > nb_of_steps:
                 self.colored_bar_lock = 0
 
+            # --> Build bar content
             for i in range(nb_of_steps):
                 if i == self.colored_bar_lock:
-                    bar = bar + self.colours["cyan"] + "=" + self.colours["reset"]
+                    bar = bar + self.colours["cyan"] + self.bar_type[self.type]["Full"] + self.colours["reset"]
                 else:
-                    bar = bar + "="
-                    
+                    bar = bar + self.bar_type[self.type]["Full"]
+
             bar = bar + ">"
             for _ in range(self.bar_size-nb_of_steps):
-                bar = bar + " "
+                bar = bar + self.bar_type[self.type]["Empty"]
             bar = bar + "]"
 
         else:
@@ -143,12 +158,12 @@ class Progress_bar:
             rainbow = -1
             nb_of_steps = int(self.current / self.step)
             for _ in range(self.bar_size - nb_of_steps):
-                bar = " " + bar
+                bar = self.bar_type[self.type]["Empty"] + bar
 
             bar = self.colours["reset"] + ">" + bar
 
             for _ in range(nb_of_steps):
-                bar = rainbow_lst[rainbow] + "=" + bar
+                bar = rainbow_lst[rainbow] + self.bar_type[self.type]["Full"] + bar
                 rainbow -= 1
                 if rainbow < -1 * len(rainbow_lst):
                     rainbow = -1
@@ -288,7 +303,16 @@ class Progress_bar:
 
 if __name__ == "__main__":
     maxi_step = 100
-    bar = Progress_bar(maxi_step, label="Demo bar", process_count=True, progress_percent=True, run_time=True, eta=True, overwrite_setting=True, rainbow_bar=True)
+    "Bar type options: Equal, Solid, Circle, Square"
+    bar = Progress_bar(maxi_step,
+                       label="Demo bar",
+                       process_count=True,
+                       progress_percent=True,
+                       run_time=True,
+                       eta=True,
+                       overwrite_setting=True,
+                       bar_type="Equal",
+                       rainbow_bar=False)
 
     for i in range(maxi_step):
         for j in range(4):
