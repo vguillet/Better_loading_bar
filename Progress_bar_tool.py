@@ -55,14 +55,17 @@ class Progress_bar:
 
         self.indicator_dict = {"Bar spinner": ["-", "\\", "|", "/"],
                                "Dots": ["   ", ".  ", ".. ", "..."],
-                               "Dot Column": ['⡀', '⡄', '⡆', '⡇', '⣇', '⣧', '⣷', '⣿'],
+                               "Column": ['⡀', '⡄', '⡆', '⡇', '⣇', '⣧', '⣷', '⣿'],
                                "Pie spinner": ['◷', '◶', '◵', '◴'],
                                "Moon spinner": ['◑', '◒', '◐', '◓'],
-                               "Stack": [' ', '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█']}
+                               "Stack": [' ', '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'],
+                               "Pie stack": ['○', '◔', '◑', '◕', '●']}
 
         self.colours = {"reset": "\033[0m",
                         "bold": "\033[1m",
-                        "green": "\033[3;32;1m",
+                        "italic": "\033[3m",
+                        "underline": "\033[4m",
+                        "green": "\033[32;1m",
                         "red": "\033[31;1m",
                         "magenta": "\033[35;1m",
                         "yellow": "\033[33;1m",
@@ -154,7 +157,7 @@ class Progress_bar:
                 self.colored_bar_lock = 0
 
             for step in range(nb_of_steps):
-                if step == self.colored_bar_lock:
+                if step == self.colored_bar_lock or step == self.colored_bar_lock - 1:
                     bar = bar + self.colours["cyan"] + self.bar_dict[self.bar_type]["Full"] + self.colours["reset"]
                 else:
                     bar = bar + self.bar_dict[self.bar_type]["Full"]
@@ -221,7 +224,7 @@ class Progress_bar:
     def __activity_indicator(self):
         if self.overwrite_setting is True and self.current != self.max_step:
             self.current_indicator_pos += 1
-            if self.current_indicator_pos > len(self.indicator_dict[self.indicator_type])-1:
+            if self.current_indicator_pos >= len(self.indicator_dict[self.indicator_type]):
                 self.current_indicator_pos = 0
             return "[" + self.colours["cyan"] + self.indicator_dict[self.indicator_type][self.current_indicator_pos] + self.colours["reset"] + "] "
         else:
@@ -317,7 +320,7 @@ class Progress_bar:
 if __name__ == "__main__":
     maxi_step = 100
     "Bar type options: Equal, Solid, Circle, Square"
-    "Activity indicator type options: Bar spinner, Dots, Column, Pie spinner, Moon spinner"
+    "Activity indicator type options: Bar spinner, Dots, Column, Pie spinner, Moon spinner, Stack, Pie stack"
 
     bar = Progress_bar(maxi_step,
                        label="Demo bar",
@@ -327,12 +330,12 @@ if __name__ == "__main__":
                        eta=True,
                        overwrite_setting=True,
                        bar_type="Equal",
-                       activity_indicator_type="Moon spinner",
+                       activity_indicator_type="Pie stack",
                        rainbow_bar=True)
 
     for i in range(maxi_step):
-        for j in range(4):
+        for j in range(1):
             bar.update_activity()
-            time.sleep(0.1)
+            time.sleep(0.03)
         bar.update_progress()
 
