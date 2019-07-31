@@ -26,6 +26,8 @@ bar =  Progress_bar(max_step=30)
 
 Run `.update_progress` to update progress (for loops) or `.update_activity` to keep the activity animations going between main progress updates (when minor progress is made).
 
+*Tips: In case of very quick loops, disable "activity_indicator" 
+
 ### Activity bar
 
 Activity bars are used to keep track of unknown-length processes (while loops).
