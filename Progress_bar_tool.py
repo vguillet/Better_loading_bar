@@ -163,19 +163,19 @@ class Progress_bar:
             rainbow_lst = [self.colours["red"], self.colours["yellow"], self.colours["green"],
                            self.colours["cyan"], self.colours["blue"], self.colours["magenta"]]
 
-            if self.colored_bar_lock > len(rainbow_lst):
+            if self.colored_bar_lock >= len(rainbow_lst):
                 self.colored_bar_lock = 0
 
             rainbow = self.colored_bar_lock
 
             # --> Create filled portion of bar
             for _ in range(nb_of_steps):
-                bar = bar + rainbow_lst[rainbow] + self.bar_dict[self.bar_type]["Full"] + bar
+                bar = bar + rainbow_lst[rainbow] + self.bar_dict[self.bar_type]["Full"]
                 rainbow += 1
-                if rainbow > len(rainbow_lst):
+                if rainbow >= len(rainbow_lst):
                     rainbow = 0
 
-        bar = ">" + bar
+        bar = bar + self.colours["reset"] + ">"
 
         # --> Create empty portion of bar
         for _ in range(self.bar_size - nb_of_steps):
