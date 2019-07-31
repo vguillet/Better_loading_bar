@@ -4,12 +4,14 @@ from math import modf
 
 class Progress_bar:
     def __init__(self, max_step, bar_size=30, label=None,
+                 activity_indicator=True,
                  process_count=True,
                  progress_percent=True,
                  run_time=True,
                  eta=True,
                  overwrite_setting=True,
                  bar_type="Solid",
+                 activity_indicator_type="Dots",
                  rainbow_bar=False):
 
         # --> Initiate Progress bar
@@ -17,6 +19,7 @@ class Progress_bar:
         self.max_step = max_step
         self.bar_size = bar_size
 
+        self.print_activity_indicator = activity_indicator
         self.print_process_count = process_count
         self.print_progress_percent = progress_percent
         self.print_run_time = run_time
@@ -26,7 +29,7 @@ class Progress_bar:
         self.step = max_step/self.bar_size
         self.current = 0
         self.label = label
-        self.current_circle_pos = 0
+        self.current_indicator_pos = 0
         self.colored_bar_lock = 0
 
         # --> Initiate time tracker
@@ -35,19 +38,26 @@ class Progress_bar:
         self.run_time_lst = []
 
         # ---- Colours and Formatting
-        # --> Setting up bar formating
+        # --> Setting up bar formatting
         self.rainbow_bar = rainbow_bar
-        self.type = bar_type
+        self.bar_type = bar_type
+        self.indicator_type = activity_indicator_type
 
         # --> Setting up format library
-        self.bar_type = {"Equal": {"Full": "=",
+        self.bar_dict = {"Equal": {"Full": "=",
                                    "Empty": " "},
                          "Solid": {"Full": "█",
                                    "Empty": " "},
-                         "Circle": {"Full": "◯",
-                                    "Empty": "◉"},
-                         "Square": {"Full": "▢",
-                                    "Empty": "▣"}}
+                         "Circle": {"Full": "◉",
+                                    "Empty": "◯"},
+                         "Square": {"Full": "▣",
+                                    "Empty": "▢"}}
+
+        self.indicator_dict = {"Bar spinner": ["-", "\\", "|", "/"],
+                               "Dots": ["   ", ".  ", ".. ", "..."],
+                               "Column": ['⡀', '⡄', '⡆', '⡇', '⣇', '⣧', '⣷', '⣿'],
+                               "Pie spinner": ['◷', '◶', '◵', '◴'],
+                               "Moon spinner": ['◑', '◒', '◐', '◓']}
 
         self.colours = {"reset": "\033[0m",
                         "bold": "\033[1m",
@@ -58,7 +68,7 @@ class Progress_bar:
                         "cyan": "\033[36;1m",
                         "blue": "\033[34;1m"}
 
-    def update_progress_bar(self, current=None):
+    def update_progress(self, current=None):
         if current is not None:
             self.current = current+1
         else:
@@ -75,7 +85,7 @@ class Progress_bar:
         # --> Reset start time for next iteration
         self.start_time = time.time()
 
-    def update_activity_indicator(self):
+    def update_activity(self):
         if len(self.run_time_lst) == 0:
             printed_bar = self.__activity_bar
         else:
@@ -91,7 +101,7 @@ class Progress_bar:
     # ===============================================================================
     @property
     def __progress_bar(self):
-        return self.__loading_circle                                  \
+        return self.__activity_indicator                                  \
                + self.__label                                         \
                + self.__process_count*self.print_process_count        \
                + self.__bar                                           \
@@ -103,11 +113,11 @@ class Progress_bar:
 
     @property
     def __activity_bar(self):
-        return self.__loading_circle                                  \
+        return self.__activity_indicator                                  \
                + self.__label                                           \
                + self.__process_count*self.print_process_count        \
                + self.__bar                                           \
-               + self.__progress_percent
+               + self.__progress_percent*self.print_progress_percent
 
     @property
     def __label(self):
@@ -130,40 +140,45 @@ class Progress_bar:
 
     @property
     def __bar(self):
+        nb_of_steps = int(self.current / self.step)
+
+        # --> Define location of colored section
+        self.colored_bar_lock += 1
+        if self.colored_bar_lock > nb_of_steps:
+            self.colored_bar_lock = 0
+
         if not self.rainbow_bar:
             bar = " - ["
-            nb_of_steps = int(self.current / self.step)
 
-            # --> Define location of colored section
-            self.colored_bar_lock += 1
-            if self.colored_bar_lock > nb_of_steps:
-                self.colored_bar_lock = 0
-
-            # --> Build bar content
+            # --> Create filled portion of bar
             for i in range(nb_of_steps):
                 if i == self.colored_bar_lock:
-                    bar = bar + self.colours["cyan"] + self.bar_type[self.type]["Full"] + self.colours["reset"]
+                    bar = bar + self.colours["cyan"] + self.bar_dict[self.bar_type]["Full"] + self.colours["reset"]
                 else:
-                    bar = bar + self.bar_type[self.type]["Full"]
+                    bar = bar + self.bar_dict[self.bar_type]["Full"]
 
             bar = bar + ">"
+
+            # --> Create empty portion of bar
             for _ in range(self.bar_size-nb_of_steps):
-                bar = bar + self.bar_type[self.type]["Empty"]
+                bar = bar + self.bar_dict[self.bar_type]["Empty"]
             bar = bar + "]"
 
         else:
             rainbow_lst = [self.colours["red"], self.colours["yellow"], self.colours["green"],
                            self.colours["cyan"], self.colours["blue"], self.colours["magenta"]]
             bar = self.colours["reset"] + "]"
-            rainbow = -1
-            nb_of_steps = int(self.current / self.step)
+            rainbow = -1 + self.colored_bar_lock
+
+            # --> Create empty portion of bar
             for _ in range(self.bar_size - nb_of_steps):
-                bar = self.bar_type[self.type]["Empty"] + bar
+                bar = self.bar_dict[self.bar_type]["Empty"] + bar
 
             bar = self.colours["reset"] + ">" + bar
 
+            # --> Create filled portion of bar
             for _ in range(nb_of_steps):
-                bar = rainbow_lst[rainbow] + self.bar_type[self.type]["Full"] + bar
+                bar = rainbow_lst[rainbow] + self.bar_dict[self.bar_type]["Full"] + bar
                 rainbow -= 1
                 if rainbow < -1 * len(rainbow_lst):
                     rainbow = -1
@@ -202,15 +217,12 @@ class Progress_bar:
             return ""
 
     @property
-    def __loading_circle(self):
-        self.circle_pos_lst = ["-", "\\", "|", "/"]
-        # self.circle_pos_lst = ["   ", ".  ", ".. ", "..."]
-
+    def __activity_indicator(self):
         if self.overwrite_setting is True and self.current != self.max_step:
-            self.current_circle_pos += 1
-            if self.current_circle_pos > len(self.circle_pos_lst)-1:
-                self.current_circle_pos = 0
-            return "[" + self.colours["cyan"] + self.circle_pos_lst[self.current_circle_pos] + self.colours["reset"] + "] "
+            self.current_indicator_pos += 1
+            if self.current_indicator_pos > len(self.indicator_dict[self.indicator_type])-1:
+                self.current_indicator_pos = 0
+            return "[" + self.colours["cyan"] + self.indicator_dict[self.indicator_type][self.current_indicator_pos] + self.colours["reset"] + "] "
         else:
             return ""
 
@@ -304,6 +316,8 @@ class Progress_bar:
 if __name__ == "__main__":
     maxi_step = 100
     "Bar type options: Equal, Solid, Circle, Square"
+    "Activity indicator type options: Bar spinner, Dots, Column, Pie spinner, Moon spinner"
+
     bar = Progress_bar(maxi_step,
                        label="Demo bar",
                        process_count=True,
@@ -312,11 +326,12 @@ if __name__ == "__main__":
                        eta=True,
                        overwrite_setting=True,
                        bar_type="Equal",
+                       activity_indicator_type="Bar spinner",
                        rainbow_bar=False)
 
     for i in range(maxi_step):
         for j in range(4):
-            bar.update_activity_indicator()
-            time.sleep(0.01)
-        bar.update_progress_bar()
+            bar.update_activity()
+            time.sleep(0.2)
+        bar.update_progress()
 
