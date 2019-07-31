@@ -8,3 +8,5 @@ The progress bar also contains an activity indicator, which allows for easy dete
 The progress bar can be run on a single line or can update over new lines as process proceeds.
 
 To use, simply initiate an instance of the loading bar, specify the wanted information, and run the .update_progress_bar (for loops) or .update_activity_indicator (while loops) whenever progress is made.
+
+NEW FEATURES: Added colored and rainbow bar
