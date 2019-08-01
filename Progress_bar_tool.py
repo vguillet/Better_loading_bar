@@ -11,7 +11,7 @@ class Progress_bar:
                  eta=True,
                  overwrite_setting=True,
                  bar_type="Equal",
-                 activity_indicator_type="Dots",
+                 activity_indicator_type="Pie stack",
                  rainbow_bar=False):
 
         # --> Error-proofing input:
@@ -380,10 +380,10 @@ if __name__ == "__main__":
                        overwrite_setting=True,
                        bar_type="Equal",
                        activity_indicator_type="Pie stack",
-                       rainbow_bar=False)
+                       rainbow_bar=True)
 
     for i in range(maxi_step):
         for j in range(4):
             bar.update_activity()
-            time.sleep(0.01)
+            time.sleep(0.2)
         bar.update_progress()
