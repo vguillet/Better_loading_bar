@@ -166,7 +166,10 @@ class Progress_bar:
     @property
     def __label(self):
         if self.label is not None:
-            return self.label + " "*(6 - len(self.label)) + " | "
+            if len(self.label) <= 6:
+                return self.label + " "*(6 - len(self.label)) + " | "
+            else:
+                return self.label + " | "
         else:
             return ""
 
