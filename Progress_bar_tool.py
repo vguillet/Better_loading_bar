@@ -96,6 +96,8 @@ class Progress_bar:
             raise ValueError("Selected activity indicator type doesn't exist,"
                              "Activity indicator type options: Bar spinner, Dots, Column, Pie spinner, Moon spinner, Stack, Pie stack")
 
+        self.update_progress(current=-1)
+
     def update_progress(self, current=None):
         if not self.progress:
             raise ValueError("'max_step' needs to be specified to compute progress")
@@ -380,7 +382,7 @@ if __name__ == "__main__":
                        progress_percent=True,
                        run_time=True,
                        eta=True,
-                       overwrite_setting=False,
+                       overwrite_setting=True,
                        bar_type="Equal",
                        activity_indicator_type="Pie stack",
                        rainbow_bar=False)
@@ -388,5 +390,5 @@ if __name__ == "__main__":
     for i in range(maxi_step):
         for j in range(4):
             bar.update_activity()
-            time.sleep(0.02)
+            time.sleep(0.5)
         bar.update_progress()
