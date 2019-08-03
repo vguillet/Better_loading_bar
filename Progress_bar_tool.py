@@ -181,7 +181,7 @@ class Progress_bar:
         nb_of_steps = int(self.current / self.step)
         self.colored_bar_lock += 1
 
-        if self.overwrite_setting is False:
+        if self.overwrite_setting is False or self.current == self.max_step:
             self.colored_bar_lock = -1
 
         # --> Prefix of bar
