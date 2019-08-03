@@ -152,19 +152,21 @@ class Progress_bar:
                + self.__run_time*(1-self.progress)
 
     @property
+    def __activity_indicator(self):
+        if self.overwrite_setting is True and self.current != self.max_step:
+            self.current_indicator_pos += 1
+            if self.current_indicator_pos >= len(self.indicator_dict[self.indicator_type]):
+                self.current_indicator_pos = 0
+            return "[" + self.colours["cyan"] + self.indicator_dict[self.indicator_type][self.current_indicator_pos] + self.colours["reset"] + "] "
+        else:
+            return ""
+
+    @property
     def __label(self):
         if self.label is not None:
             return self.label + " "*(6 - len(self.label)) + " | "
         else:
             return ""
-
-    @property
-    def __progress_percent(self):
-        if round((self.current/self.max_step)*100) == 100:
-            return " - " + self.colours["green"] + \
-                   self.__aligned_number(round((self.current / self.max_step) * 100), 2) + "%" + \
-                   self.colours["reset"]
-        return " - " + self.__aligned_number(round((self.current/self.max_step)*100), 2) + "%"
 
     @property
     def __process_count(self):
@@ -179,9 +181,12 @@ class Progress_bar:
         nb_of_steps = int(self.current / self.step)
         self.colored_bar_lock += 1
 
+        if self.overwrite_setting is False:
+            self.colored_bar_lock = -1
+
         # --> Prefix of bar
         bar = " - ["
-        
+
         # ---- Create filled portion of bar
         if not self.rainbow_bar:
             # --> Define location of colored section
@@ -227,6 +232,14 @@ class Progress_bar:
         return bar
 
     @property
+    def __progress_percent(self):
+        if round((self.current/self.max_step)*100) == 100:
+            return " - " + self.colours["green"] + \
+                   self.__aligned_number(round((self.current / self.max_step) * 100), 2) + "%" + \
+                   self.colours["reset"]
+        return " - " + self.__aligned_number(round((self.current/self.max_step)*100), 2) + "%"
+
+    @property
     def __run_time(self):
         if self.progress:
             # --> Save run time to runtime list
@@ -269,16 +282,6 @@ class Progress_bar:
     def __process_completed_msg(self):
         if self.current == self.max_step:
             return " - " + self.colours["green"] + "Process Completed" + self.colours["reset"]
-        else:
-            return ""
-
-    @property
-    def __activity_indicator(self):
-        if self.overwrite_setting is True and self.current != self.max_step:
-            self.current_indicator_pos += 1
-            if self.current_indicator_pos >= len(self.indicator_dict[self.indicator_type]):
-                self.current_indicator_pos = 0
-            return "[" + self.colours["cyan"] + self.indicator_dict[self.indicator_type][self.current_indicator_pos] + self.colours["reset"] + "] "
         else:
             return ""
 
@@ -377,13 +380,13 @@ if __name__ == "__main__":
                        progress_percent=True,
                        run_time=True,
                        eta=True,
-                       overwrite_setting=True,
+                       overwrite_setting=False,
                        bar_type="Equal",
                        activity_indicator_type="Pie stack",
-                       rainbow_bar=True)
+                       rainbow_bar=False)
 
     for i in range(maxi_step):
         for j in range(4):
             bar.update_activity()
-            time.sleep(0.2)
+            time.sleep(0.02)
         bar.update_progress()
