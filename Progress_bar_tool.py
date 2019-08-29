@@ -296,7 +296,7 @@ class Progress_bar:
     def __formatted_time(self, formatted_time):
 
         formatted_time = [0, formatted_time]
-        
+
         time_dict_keys = ["seconds", "minutes", "hours", "days", "years"]
         time_dict = {"seconds": {"max": 60,
                                  "current": 0,
@@ -356,9 +356,9 @@ class Progress_bar:
         for key in time_dict_keys:
             if time_dict[key]["current"] != 0:
                 if time_dict[key]["current"] != 1:
-                    time_str = self.__aligned_number(time_dict[key]["current"], time_dict[key]["str_count"], align_side="right") + " " + key + ", " + time_str
+                    time_str = self.__aligned_number(time_dict[key]["current"], time_dict[key]["str_count"], align_side="left") + " " + key + ", " + time_str
                 else:
-                    time_str = self.__aligned_number(time_dict[key]["current"], time_dict[key]["str_count"], align_side="right") + " " + key[:-1] + " , " + time_str
+                    time_str = self.__aligned_number(time_dict[key]["current"], time_dict[key]["str_count"], align_side="left") + " " + key[:-1] + " , " + time_str
 
         return time_str[:-2]
     
