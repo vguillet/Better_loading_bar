@@ -8,6 +8,7 @@ class Progress_bar:
                  process_count=True,
                  progress_percent=True,
                  run_time=True,
+                 average_run_time=True,
                  eta=True,
                  overwrite_setting=True,
                  bar_type="Equal",
@@ -26,24 +27,27 @@ class Progress_bar:
         self.bar_size = bar_size
 
         if max_step is not None:
+            self.run_mode = 1
             self.max_step = max_step
             self.step = max_step / self.bar_size
             self.current = 0
-            self.progress = True
         else:
+            self.run_mode = 2
             self.max_step = 99999999999999999999
             self.step = 99999999999999999999
             self.current = 0
-            self.progress = False
 
         self.print_activity_indicator = activity_indicator
         self.print_process_count = process_count
         self.print_progress_percent = progress_percent
         self.print_run_time = run_time
+        self.print_average_run_time = average_run_time
         self.print_eta = eta
 
         # --> Determine bar properties based on input
+        self.progress = True
         self.label = label
+        self.current_label = None
         self.current_indicator_pos = 0
         self.colored_bar_lock = 0
 
@@ -96,22 +100,23 @@ class Progress_bar:
             raise ValueError("Selected activity indicator type doesn't exist,"
                              "Activity indicator type options: Bar spinner, Dots, Column, Pie spinner, Moon spinner, Stack, Pie stack")
 
-        self.update_progress(current=-1)
-
-    def update_progress(self, current=None):
-        if not self.progress:
+    def update_progress(self, current=None, current_process_label=None):
+        self.current_label = current_process_label
+        if self.run_mode == 2:
             raise ValueError("'max_step' needs to be specified to compute progress")
 
+        self.progress = True
+
         # --> Calc and record run time
-        self.run_time = round(time.time() - self.start_time, 3)
+        self.run_time = round(time.time() - self.start_time, 6)
 
         if current is not None:
-            self.current = current+1
+            self.current = current + 1
         else:
             self.current += 1
 
         if self.overwrite_setting:
-            print("\r"+self.__progress_bar, end="")
+            print("\r" + self.__progress_bar, end="")
         else:
             print(self.__progress_bar)
 
@@ -119,13 +124,17 @@ class Progress_bar:
         self.start_time = time.time()
 
     def update_activity(self):
-        if len(self.run_time_lst) == 0:
+        if self.run_mode == 2:
+            self.progress = True
             printed_bar = self.__activity_bar
+
         else:
+            self.progress = False
             printed_bar = self.__progress_bar
 
+        # --> Print bar
         if self.overwrite_setting:
-            print("\r"+printed_bar, end="")
+            print("\r" + printed_bar, end="")
         else:
             print(printed_bar)
 
@@ -134,24 +143,24 @@ class Progress_bar:
     # ===============================================================================
     @property
     def __progress_bar(self):
-        return self.__activity_indicator*self.print_activity_indicator                  \
-               + self.__label                                                           \
-               + self.__process_count*self.print_process_count                          \
-               + self.__bar*self.progress                                               \
-               + self.__progress_percent*self.print_progress_percent*self.progress      \
-               + "  "*(self.print_run_time or self.print_eta)                           \
-               + self.__run_time*self.print_run_time                                    \
-               + self.__eta*self.print_eta*self.progress                                \
-               + self.__process_completed_msg*self.progress
+        return self.__activity_indicator * self.print_activity_indicator \
+               + self.__label \
+               + self.__process_count * self.print_process_count \
+               + self.__bar \
+               + self.__progress_percent * self.print_progress_percent \
+               + "  " * (self.print_run_time or self.print_eta or self.print_average_run_time) \
+               + self.__average_run_time * self.print_average_run_time \
+               + self.__run_time * self.print_run_time \
+               + self.__eta * self.print_eta \
+               + self.__process_completed_msg
 
     @property
     def __activity_bar(self):
-        return self.__activity_indicator*self.print_activity_indicator                  \
-               + self.__label                                                           \
-               + self.__process_count*self.print_process_count                          \
-               + self.__bar*self.progress                                               \
-               + self.__progress_percent*self.print_progress_percent*self.progress      \
-               + self.__run_time*(1-self.progress)
+        return self.__activity_indicator * self.print_activity_indicator \
+               + self.__label \
+               + self.__process_count * self.print_process_count \
+               + self.__average_run_time * self.print_average_run_time \
+               + self.__run_time
 
     @property
     def __activity_indicator(self):
@@ -159,23 +168,31 @@ class Progress_bar:
             self.current_indicator_pos += 1
             if self.current_indicator_pos >= len(self.indicator_dict[self.indicator_type]):
                 self.current_indicator_pos = 0
-            return "[" + self.colours["cyan"] + self.indicator_dict[self.indicator_type][self.current_indicator_pos] + self.colours["reset"] + "] "
+            return "[" + self.colours["cyan"] + self.indicator_dict[self.indicator_type][self.current_indicator_pos] + self.colours[
+                "reset"] + "] "
         else:
             return ""
 
     @property
     def __label(self):
+        label_str = ""
         if self.label is not None:
             if len(self.label) <= 6:
-                return self.label + " "*(6 - len(self.label)) + " | "
+                label_str = self.label + " " * (6 - len(self.label)) + " | "
             else:
-                return self.label + " | "
-        else:
-            return ""
+                label_str = self.label + " | "
+
+        if self.current_label is not None:
+            if len(self.label) <= 6:
+                label_str = label_str + self.current_label + " " * (6 - len(self.current_label)) + " - "
+            else:
+                label_str = label_str + self.current_label + " - "
+
+        return label_str
 
     @property
     def __process_count(self):
-        if self.progress:
+        if self.run_mode == 1:
             return self.__aligned_number(self.current, len(str(self.max_step))) + "/" + str(self.max_step)
         else:
             self.current += 1
@@ -238,35 +255,36 @@ class Progress_bar:
 
     @property
     def __progress_percent(self):
-        if round((self.current/self.max_step)*100) == 100:
+        if round((self.current / self.max_step) * 100) == 100:
             return " - " + self.colours["green"] + \
                    self.__aligned_number(round((self.current / self.max_step) * 100), 2) + "%" + \
                    self.colours["reset"]
-        return " - " + self.__aligned_number(round((self.current/self.max_step)*100), 2) + "%"
+        return " - " + self.__aligned_number(round((self.current / self.max_step) * 100), 2) + "%"
 
     @property
     def __run_time(self):
-        if self.progress:
-            # --> Save run time to runtime list
-            self.run_time_lst.append(self.run_time)
+        if self.run_mode == 1:
+            if self.progress:
+                # --> Save run time to runtime list
+                self.run_time_lst.append(self.run_time)
 
             if self.current != self.max_step:
                 # --> Create run time string
                 run_time_str = self.__formatted_time(self.run_time)
             else:
                 # --> Create total run time string
-                total_run_time_str = self.__formatted_time(round(time.time() - self.initial_start_time, 3))
+                total_run_time_str = self.__formatted_time(round(time.time() - self.initial_start_time, 4))
                 return " - " + self.colours["bold"] + "Total run time: " + self.colours["reset"] + total_run_time_str
 
         else:
             # --> Calc run time
-            self.run_time = round(time.time() - self.start_time, 3)
+            self.run_time = round(time.time() - self.start_time, 4)
 
             # --> Reset start time for next iteration
             self.start_time = time.time()
 
             # --> Create run time string (including total run time)
-            total_run_time_str = self.__formatted_time(round(time.time() - self.initial_start_time, 3))
+            total_run_time_str = self.__formatted_time(round(time.time() - self.initial_start_time, 4))
             run_time_str = self.__formatted_time(self.run_time) + " - " + "Total run time: " + self.colours["reset"] + total_run_time_str
 
         if len(run_time_str) > 0:
@@ -275,11 +293,23 @@ class Progress_bar:
             return ""
 
     @property
-    def __eta(self):
-        eta_str = self.__formatted_time(sum(self.run_time_lst)/len(self.run_time_lst) * (self.max_step-self.current))
+    def __average_run_time(self):
+        if len(self.run_time_lst) > 0:
+            return " - " + self.colours["bold"] + "iter/s: " + str(
+                self.__formatted_time(round(sum(self.run_time_lst) / len(self.run_time_lst), 4)))
+        else:
+            return ""
 
-        if len(eta_str) > 0:
-            return " - " + self.colours["bold"] + "ETA: " + self.colours["reset"] + eta_str
+    @property
+    def __eta(self):
+        if len(self.run_time_lst) > 0:
+            eta_str = self.__formatted_time(sum(self.run_time_lst) / len(self.run_time_lst) * (self.max_step - self.current))
+
+            if len(eta_str) > 0:
+                return " - " + self.colours["bold"] + "ETA: " + self.colours["reset"] + eta_str
+            else:
+                return ""
+
         else:
             return ""
 
@@ -297,42 +327,51 @@ class Progress_bar:
 
         formatted_time = [0, formatted_time]
 
-        time_dict_keys = ["seconds", "minutes", "hours", "days", "years"]
+        time_dict_keys = ["seconds", "minutes", "hours", "days", "weeks", "months", "years", "decades", "centuries"]
         time_dict = {"seconds": {"max": 60,
                                  "current": 0,
-                                 "str_count": 5},
+                                 "str_count": 5,
+                                 "str": ":"},
 
                      "minutes": {"max": 60,
                                  "current": 0,
-                                 "str_count": 2},
+                                 "str_count": 2,
+                                 "str": ":"},
 
                      "hours": {"max": 24,
                                "current": 0,
-                               "str_count": 2},
+                               "str_count": 2,
+                               "str": ":"},
 
                      "days": {"max": 365,
                               "current": 0,
-                              "str_count": 1},
+                              "str_count": 1,
+                              "str": " days, "},
 
                      "weeks": {"max": 365,
                                "current": 0,
-                               "str_count": 1},
+                               "str_count": 1,
+                               "str": " weeks, "},
 
                      "months": {"max": 12,
                                 "current": 0,
-                                "str_count": 2},
+                                "str_count": 2,
+                                "str": " months, "},
 
                      "years": {"max": 10,
                                "current": 0,
-                               "str_count": 1},
+                               "str_count": 1,
+                               "str": " years, "},
 
                      "decades": {"max": 10,
                                  "current": 0,
-                                 "str_count": 2},
+                                 "str_count": 2,
+                                 "str": " decades, "},
 
                      "centuries": {"max": 99999999999999999999999,
                                    "current": 0,
-                                   "str_count": 5}}
+                                   "str_count": 5,
+                                   "str": " centuries, "}}
 
         # --> Fill time dict
         current_time_key = 0
@@ -340,28 +379,33 @@ class Progress_bar:
         while formatted_time[1] / time_dict[time_dict_keys[current_time_key]]["max"] > 1:
             formatted_time = list(modf(formatted_time[1] / time_dict[time_dict_keys[current_time_key]]["max"]))
             if current_time_key == 0:
-                time_dict[time_dict_keys[current_time_key]]["current"] = round(formatted_time[0] * time_dict[time_dict_keys[current_time_key]]["max"], 2)
+                time_dict[time_dict_keys[current_time_key]]["current"] = round(
+                    formatted_time[0] * time_dict[time_dict_keys[current_time_key]]["max"], 3)
             else:
-                time_dict[time_dict_keys[current_time_key]]["current"] = round(formatted_time[0] * time_dict[time_dict_keys[current_time_key]]["max"])
+                time_dict[time_dict_keys[current_time_key]]["current"] = round(
+                    formatted_time[0] * time_dict[time_dict_keys[current_time_key]]["max"])
 
             current_time_key += 1
 
         if current_time_key != 0:
             time_dict[time_dict_keys[current_time_key]]["current"] = round(formatted_time[1])
         else:
-            time_dict[time_dict_keys[current_time_key]]["current"] = round(formatted_time[1] + formatted_time[0], 2)
+            time_dict[time_dict_keys[current_time_key]]["current"] = round(formatted_time[1] + formatted_time[0], 3)
 
         # --> Create time string
         time_str = ""
         for key in time_dict_keys:
             if time_dict[key]["current"] != 0:
                 if time_dict[key]["current"] != 1:
-                    time_str = self.__aligned_number(time_dict[key]["current"], time_dict[key]["str_count"], align_side="left") + " " + key + ", " + time_str
-                else:
-                    time_str = self.__aligned_number(time_dict[key]["current"], time_dict[key]["str_count"], align_side="left") + " " + key[:-1] + " , " + time_str
+                    time_str = self.__aligned_number(time_dict[key]["current"], time_dict[key]["str_count"], align_side="left") + \
+                               time_dict[key]["str"] + time_str
 
-        return time_str[:-2]
-    
+        # --> Add s unit if time is only seconds
+        if len(time_str) < 8:
+            return time_str[:-2] + "s"
+        else:
+            return time_str[:-2]
+
     @staticmethod
     def __aligned_number(current, req_len, align_side="left"):
         current = str(current)
@@ -375,7 +419,9 @@ class Progress_bar:
 
 
 if __name__ == "__main__":
-    maxi_step = 100
+    import random
+
+    maxi_step = 1000
     "Bar type options: Equal, Solid, Circle, Square"
     "Activity indicator type options: Bar spinner, Dots, Column, Pie spinner, Moon spinner, Stack, Pie stack"
 
@@ -384,14 +430,15 @@ if __name__ == "__main__":
                        process_count=True,
                        progress_percent=True,
                        run_time=True,
+                       average_run_time=True,
                        eta=True,
                        overwrite_setting=True,
                        bar_type="Equal",
                        activity_indicator_type="Pie stack",
                        rainbow_bar=False)
-
+    
     for i in range(maxi_step):
         for j in range(4):
-            bar.update_activity()
-            time.sleep(0.5)
+            # bar.update_activity()
+            time.sleep(0.2)
         bar.update_progress()
