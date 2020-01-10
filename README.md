@@ -19,16 +19,16 @@ The bar is fully customisable, just set to *False* all unwanted information and 
 
 ```python
 Progress_bar(max_step=maxi_step,
-                       label="Demo bar",
-                       process_count=True,
-                       progress_percent=True,
-                       run_time=True,
-                       average_run_time=True,
-                       eta=True,
-                       overwrite_setting=True,
-                       bar_type="Equal",
-                       activity_indicator_type="Pie stack",
-                       rainbow_bar=False)
+             label="Demo bar",
+             process_count=True,
+             progress_percent=True,
+             run_time=True,
+             average_run_time=True,
+             eta=True,
+             overwrite_setting=True,
+             bar_type="Equal",
+             activity_indicator_type="Pie stack",
+             rainbow_bar=False)
 ```
 
 ANSI colours are used to enhance readability, but require compatible install to be visible (progress bar will work regardless). A special **Rainbow mode** is available for maximum visibility!
