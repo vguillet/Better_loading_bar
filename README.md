@@ -37,9 +37,15 @@ Progress bars are used to keep track of pre-defined length processes. To create 
 bar =  Progress_bar(max_step=30)
 ```
 
-Run `.update_progress` to update progress (for loops) and/or `.update_activity` to keep the activity animations going between main progress updates (when minor progress is made during a long loop for example).
+Run `.update_progress` to update progress (for loops) and/or `.update_activity` to keep the activity animations going between main progress updates (when minor progress is made during a long loop for example). A label for the current ongoing process can be specified to keep track of sub-task in a large loop consisting of multiple steps.
 
-*Tips: In case of very quick loops, disable "activity_indicator" 
+```python
+bar.update_progress(self, current=None, current_process_label=None)
+
+bar.update_activity()
+```
+
+*Tips: In case of very short itteration loops, disable "activity_indicator" 
 
 ### Activity bar
 
@@ -51,3 +57,8 @@ bar =  Progress_bar(max_step=None)
 ```
 
 Run `.update_activity` at the end of every iteration to update activity.
+
+```python
+bar.update_activity()
+```
+
