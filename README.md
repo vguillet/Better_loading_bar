@@ -3,6 +3,10 @@
 
 "Add a fully-featured loading bar to any loop type and process in just two lines!"
 
+```python
+[○] Demo bar | 0370/1000 - [===========>                   ] - 37%   - iter/s: 0.08s - Run time: 0.08s - ETA: 51.70s
+```
+
 **Better_loading_bar** is a single script, multi-function, and multi-option class meant to allow for easy setting up and tracking of tasks progress. 
 
 Integration is kept as simple as possible, while giving the user full access to a significant number of usefull information such as ETA, run time, completion, etc... The progress bar also contains an **activity indicator**, which allows for easy determination of ongoing processes existance (useful for long loops).
