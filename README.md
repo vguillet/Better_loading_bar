@@ -1,7 +1,7 @@
 # Better_loading_bar
 
 
-"Add a full-featured loading bar to any loop type and process in just two lines!"
+"Add a fully-featured loading bar to any loop type and process in just two lines!"
 
 
 **Better_loading_bar** is a single script, multi-function, and multi-option class meant to allow for easy setting up and tracking of tasks progress. 
