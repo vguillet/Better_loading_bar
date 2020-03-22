@@ -66,3 +66,4 @@ Run `.update_activity` at the end of every iteration to update activity.
 bar.update_activity()
 ```
 
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/vguillet/Better_loading_bar)
