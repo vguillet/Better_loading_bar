@@ -2,7 +2,9 @@
 
 
 "Add a fully-featured loading bar to any loop type and process in just two lines!"
+
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/vguillet/Better_loading_bar)
+
 
 ```python
 [○] Demo bar | 0370/1000 - [===========>                   ] - 37%   - iter/s: 0.08s - Run time: 0.08s - ETA: 51.70s
