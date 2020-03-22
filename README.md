@@ -6,6 +6,7 @@
 ```python
 [○] Demo bar | 0370/1000 - [===========>                   ] - 37%   - iter/s: 0.08s - Run time: 0.08s - ETA: 51.70s
 ```
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/vguillet/Better_loading_bar)
 
 **Better_loading_bar** is a single script, multi-function, and multi-option class meant to allow for easy setting up and tracking of tasks progress. 
 
@@ -65,5 +66,3 @@ Run `.update_activity` at the end of every iteration to update activity.
 ```python
 bar.update_activity()
 ```
-
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/vguillet/Better_loading_bar)
