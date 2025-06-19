@@ -119,7 +119,7 @@ class ProgressBar:
         # elapsed time
         total = now - self.start_time
         if self.show_time:
-            parts.append(f"⏱️ {total:.2f}s")
+            parts.append(f"⏱️ Run Time: {total:.2f}s")
 
         # rate
         if self.show_rate and self.times:
@@ -129,7 +129,7 @@ class ProgressBar:
         # ETA
         if self.show_eta and self.times and self.current < self.max:
             eta = (sum(self.times)/len(self.times))*(self.max-self.current)
-            parts.append(f"⏳ {eta:.2f}s")
+            parts.append(f"⏳ ETA: {eta:.2f}s")
 
         # done
         if self.current >= self.max:
@@ -137,25 +137,27 @@ class ProgressBar:
 
         return " | ".join(parts)
 
-    def update(self, step=None, sublabel=None):
+    def update(self, step=None, sublabel=None, print_bar=True) -> str:
         """Use in for-loops."""
         self.current = step if step is not None else self.current + 1
 
         # --> Print bar
-        if self.overwrite:
-            print(f"\r{self._render_parts(sublabel)}", end="", flush=True)
-        else:
-            print(self._render_parts(sublabel))
+        if print_bar:
+            if self.overwrite:
+                print(f"\r{self._render_parts(sublabel)}", end="", flush=True)
+            else:
+                print(self._render_parts(sublabel))
 
-        if self.current == self.max:
-            print("\n")
+            if self.current == self.max:
+                print("\n")
 
+        return self._render_parts(sublabel)
 
 if __name__ == "__main__":
     # for-loop example
     pb = ProgressBar(
-        50, 
-        label="Loading", 
+        50,
+        label="Loading",
         rainbow=True
     )
     for i in range(50):
